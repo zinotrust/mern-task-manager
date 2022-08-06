@@ -9,8 +9,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+const logger = (req, res, next) => {
+  console.log("Middleware ran");
+  next();
+};
+
 // Routes
-app.get("/", (req, res) => {
+app.get("/", logger, (req, res) => {
   res.send("Welcome to the home page");
 });
 
@@ -18,6 +23,8 @@ app.get("/", (req, res) => {
 app.post("/api/tasks", async (req, res) => {
   //   console.log(req.body);
   //   res.send("Task created");
+  const task = await Task.create(req.body);
+  res.status(200).json(task);
   try {
     const task = await Task.create(req.body);
     res.status(200).json(task);
@@ -26,10 +33,8 @@ app.post("/api/tasks", async (req, res) => {
   }
 });
 
-// Create a Task
+// Get all Tasks
 app.get("/api/tasks", async (req, res) => {
-  //   console.log(req.body);
-  //   res.send("Task created");
   try {
     const tasks = await Task.find();
     res.status(200).json(tasks);
