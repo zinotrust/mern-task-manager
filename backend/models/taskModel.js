@@ -6,6 +6,11 @@ const taskSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add a task"],
     },
+    completed: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   {
     timestamps: true,
