@@ -11,6 +11,7 @@ const TaskList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [taskID, setTaskID] = useState("");
+  const [completedTasks, setCompletedTasks] = useState([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -26,7 +27,6 @@ const TaskList = () => {
       setTasks(data);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       toast(error.message);
       setIsLoading(false);
     }
@@ -43,13 +43,15 @@ const TaskList = () => {
 
   const createTask = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    // console.log(formData);
+    if (name === "") {
+      return toast.error("Input field cannot be empty!");
+    }
     try {
       await axios.post(`${URL}/api/tasks`, formData);
       setFormData({ ...formData, name: "" });
       getTasks();
     } catch (error) {
-      console.log(error.message);
       toast(error.message);
     }
   };
@@ -64,7 +66,7 @@ const TaskList = () => {
   };
 
   const getSingleTask = (task) => {
-    console.log(task);
+    // console.log(task);
     setFormData({ name: task.name, completed: false });
     setTaskID(task._id);
     setIsEditing(true);
@@ -72,7 +74,10 @@ const TaskList = () => {
 
   const updateTask = async (e) => {
     e.preventDefault();
-    console.log("updated");
+    // console.log("updated");
+    if (name === "") {
+      return toast.error("Input field cannot be empty!");
+    }
     try {
       await axios.put(`${URL}/api/tasks/${taskID}`, formData);
       setFormData({ ...formData, name: "" });
@@ -84,7 +89,7 @@ const TaskList = () => {
   };
 
   const setToComplete = async (task) => {
-    console.log(task);
+    // console.log(task);
     const newFormData = {
       name: task.name,
       completed: true,
@@ -96,6 +101,12 @@ const TaskList = () => {
       toast(error.message);
     }
   };
+  useEffect(() => {
+    const cTask = tasks.filter((task) => {
+      return task.completed === true;
+    });
+    setCompletedTasks(cTask);
+  }, [tasks]);
 
   return (
     <div>
@@ -107,6 +118,17 @@ const TaskList = () => {
         isEditing={isEditing}
         updateTask={updateTask}
       />
+      {tasks.length > 0 && (
+        <div className="--flex-between --pb">
+          <p>
+            <b>Total Tasks:</b> {tasks.length}
+          </p>
+          <p>
+            <b>Completed Tasks:</b> {completedTasks.length}
+          </p>
+        </div>
+      )}
+
       <hr />
       {isLoading && (
         <div className="--flex-center">
@@ -114,7 +136,7 @@ const TaskList = () => {
         </div>
       )}
       {!isLoading && tasks.length === 0 ? (
-        <p>No task to display</p>
+        <p className="--py">No task added. Please add a task.</p>
       ) : (
         <>
           {tasks.map((task, index) => {

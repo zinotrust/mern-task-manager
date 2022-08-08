@@ -494,6 +494,16 @@ a:hover {
   background-color: #eee;
   padding: 10px;
   margin: 7px 0;
+  animation: slide-in ease 0.5s;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(40px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .task::after {
