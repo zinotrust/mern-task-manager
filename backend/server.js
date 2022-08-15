@@ -13,10 +13,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use("/api/tasks", taskRoutes);
 
-// Routes
-app.get("/", logger, (req, res) => {
-  res.send("Welcome to the home page");
-});
+// Load React App in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(
+      path.resolve(__dirname, "../", "frontend", "build", "index.html")
+    )
+  );
+} else {
+  app.get("/", logger, (req, res) => {
+    res.send("Welcome to the home page");
+  });
+}
 
 const PORT = process.env.PORT || 8000;
 // Connect DB & start server
